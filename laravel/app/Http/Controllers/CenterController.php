@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Slice;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\DB;
@@ -220,7 +221,11 @@ class CenterController extends BaseController
     public function private_list()
     {
         $id=session()->get("user_id");
-        $data = DB::select("select private_id,private,my_id,private.user_id,private,add_time,title,pid,user_name,user_email from private INNER JOIN user on user.user_id =private.my_id where pid=0 && (my_id=$id or private.user_id=$id)");
+        $data = DB::select(
+                            "select private_id,private,my_id,private.user_id,private,add_time,title,pid,user_name,user_email 
+                            from private 
+                            INNER JOIN user on user.user_id =private.my_id 
+                            where pid=0 && (my_id=$id or private.user_id=$id)");
         return view("Center.private_list",["data"=>$data]);
 
     }
@@ -349,7 +354,6 @@ class CenterController extends BaseController
         $user_id = session('user_id');
         $sql = "select * from attentd where my_id = $user_id";
         $res = DB::select($sql);
-
         $arr = [];
         if( !empty($res) ){
             foreach($res as $k=>$v){
@@ -362,9 +366,9 @@ class CenterController extends BaseController
 
                 $fans_num = DB::table("attentd")->where("your_id","=",$your_id)->count();
                 $arr[$k]['fans_num'] = $fans_num;
+
             }
         }
-        //print_r($arr);die;
         return view("Center/attentd",[
             'users' => $arr
         ]);
@@ -591,6 +595,66 @@ class CenterController extends BaseController
         return view("Center.myreply",[
             'reply'=>$reply
         ]);
+    }
+    /***
+     * 好友亲密度
+     * 规则私信一条亲密度增加10%;
+     */
+    public function Intimacy()
+    {
+        /**
+         * 谁在意我
+         */
+        //用户ID
+        $user_id = session("user_id");
+        $your_id = DB::table('attentd')->where('my_id',$user_id)->select('your_id')->get();
+        $array = [];
+        foreach ($your_id as $key=>$val)
+        {
+
+                //查询用户信息
+                $your_id = $val['your_id'];
+                $user = DB::table('user')->where('user_id',$your_id)->select('user_photo','user_name')->first();
+                $array[$key]['user_info'] = $user;
+                $array[$key]['intimacy']=DB::table('private')->where('my_id',$your_id)->where('pid',0)->count();
+                $intimacy = array();
+                foreach ($array as $array1)
+                {
+                    $intimacy[]=$array1['intimacy'];
+                }
+                array_multisort($intimacy, SORT_DESC, $array);
+
+        }
+        foreach ($array as $k=>$val)
+        {
+            switch ($val['intimacy'])
+            {
+                case 0:$array[$k]['intimacy']='0%';break;
+                case 1:$array[$k]['intimacy']='5%';break;
+                case 2:$array[$k]['intimacy']='10%';break;
+                case 3:$array[$k]['intimacy']='15%';break;
+                case 4:$array[$k]['intimacy']='20%';break;
+                case 5:$array[$k]['intimacy']='25%';break;
+                case 6:$array[$k]['intimacy']='30%';break;
+                case 7:$array[$k]['intimacy']='35%';break;
+                case 8:$array[$k]['intimacy']='40%';break;
+                case 9:$array[$k]['intimacy']='45%';break;
+                case 10:$array[$k]['intimacy']='50%';break;
+                case 11:$array[$k]['intimacy']='55%';break;
+                case 12:$array[$k]['intimacy']='60%';break;
+                case 13:$array[$k]['intimacy']='65%';break;
+                case 14:$array[$k]['intimacy']='70%';break;
+                case 15:$array[$k]['intimacy']='75%';break;
+                case 16:$array[$k]['intimacy']='80%';break;
+                case 17:$array[$k]['intimacy']='85%';break;
+                case 18:$array[$k]['intimacy']='90%';break;
+                case 19:$array[$k]['intimacy']='95%';break;
+                case 20:$array[$k]['intimacy']='100%';break;
+                default:$array[$k]['intimacy']='100%';break;
+            }
+        }
+        $array = array_slice($array,0,5);
+        return view('Center.intimacy',['array'=>$array]);
     }
 
 }

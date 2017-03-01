@@ -18,7 +18,7 @@
     <script>
         var logined = 0
     </script>
-    <title>看看吧 我的好友</title>
+    <title>看看吧 好友亲密度</title>
     <style>
         .a_type{
             color: black;
@@ -90,43 +90,29 @@
     <div id="content">
         <div id="lists" class="content">
             <input type="hidden" id="_token" name="_token" value="<?php echo csrf_token(); ?>">
-            <?php
-                if(empty($users)){
-                    echo "您没有关注任何好友~";
-                }
-            ?>
-            <div id="wrapper">
-            <ul>
-                <?php foreach($users as $k=>$v):?>
-                <li class="lists">
-                    <div class="wrap">
-                            <div class="list_litpic fl"><img class="lazy" src="http://www.hanhaojie.cn/<?=$v['user_photo']?>" alt="loading..."/></div>
-                            <div class="list_info">
-                                <h4><?=$v['user_email']?></h4>
-                                <h5>发表文章<em>(<?=$v['article_num']?>)</em></h5>
-                                <h5>粉丝数量<em>(<?=$v['fans_num']?>)</em></h5>
-                                <div class="list_info_i" style="margin-top: 8px;">
-                                    <dl class="list_info_like">
-                                        <dt></dt>
-                                        <dd author_id="<?=$v['user_id']?>" style="cursor:pointer;">
-                                            <span class="clear_attentd">取消关注</span>
-                                            <span class="attentd" style="display:none;color:red;">再次关注</span>
-                                        </dd>
-                                        <dd>
-                                            <span class="clear_attentd"><a href="private?user_id=<?=$v['user_id']?>" style="font-size: 11px;color: black">私信</a></span>
-                                        </dd>
-                                        <div class="clear"></div>
-                                    </dl>
-                                    <div class="clear"></div>
-                                </div>
-                            </div>
-                            <div class="clear"></div>
-                    </div>
-                </li>
-                    <br>
-                <?php endforeach;?>
-            </ul>
-            </div>
+            <table>
+                <th></th>
+                <th style="font-size: 20px; padding-bottom: 10px;">排行</th>
+                <th></th>
+                <th style="font-size: 20px;padding-bottom: 10px;">亲密度</th>
+            @foreach($array as $key=>$val)
+                        <tr>
+                            @if($key+1==1)
+                                <td style="font-size: 50px; color:orangered">{{$key+1}}</td>
+                                    @else
+                                <td style="font-size: 30px;">{{$key+1}}</td>
+                            @endif
+                            <td>&nbsp;&nbsp;<img src="http://www.hanhaojie.cn/{{$val['user_info']['user_photo']}}" style="width: 100px;height: 100px"></td>
+                            <td style="width: 150px;">&nbsp;&nbsp;{{$val['user_info']['user_name']}}</td>
+                            @if($val['intimacy']!='0%')
+                                    <td><span style="font-size: 20px; color: orangered;">{{$val['intimacy']}}</span></td>
+                            @else
+                                    <td><span style="font-size: 20px;">{{$val['intimacy']}}</span></td>
+                            @endif
+                        </tr>
+            @endforeach
+            </table>
+
             {{--<div class="list_loading"><i></i><span>努力加载中...</span></div>--}}
             <div id='pagination'>
             </div>
@@ -173,10 +159,10 @@
 <script language="javascript" src="js/script.js"></script>
 <script language="javascript" src="js/jquery.lazyload.js"></script>
 <script src="dist/dropload.min.js"></script>
-
 </body>
 <script type="text/javascript">
     $(function() {
+        /*图片懒加载*/
         $("img.lazy").lazyload({
             event : "sporty"
         });
@@ -184,54 +170,5 @@
     $(window).bind("load", function() {
         var timeout = setTimeout(function() { $("img.lazy").trigger("sporty") }, 2000	);
     });
-
-    //点击取消关注
-    $(".clear_attentd").click(function(){
-
-        var author_id = $(this).parent().attr("author_id");
-        var _this = $(this);
-        var _token=$('#_token').val();
-
-        $.ajax({
-            url:"clear_attentd",
-            type:"post",
-            data:{author_id:author_id,_token:_token},
-            success:function(msg){
-                console.log(msg);
-                if(msg == 'ok'){
-                    _this.hide();
-                    _this.parent().children(".attentd").show();
-                }
-            }
-        })
-
-    })
-    /**
-     *	点击关注作者
-     */
-    $('.attentd').click(function(){
-
-        var author_id = $(this).parent().attr("author_id");
-        var _this = $(this);
-        var _token=$('#_token').val();
-
-        $.ajax({
-            url:"attentd",
-            type:"post",
-            data:{author_id:author_id,_token:_token},
-            success:function(msg){
-                if(msg==1){
-                    console.log("已经关注过了");
-                    _this.parent().children(".clear_attentd").show();
-                    _this.hide();
-                }else if(msg==0){
-                    console.log("关注成功");
-                    _this.parent().children(".clear_attentd").show();
-                    _this.hide();
-                }
-
-            }
-        })
-    })
 </script>
 </html>

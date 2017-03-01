@@ -100,3 +100,6 @@ Route::get('user_login',"RegisterController@user_login");
 
 //取消关注 hhj
 Route::post('clear_attentd',"CenterController@clear_attentd");
+
+//好友亲密度
+Route::get('Intimacy','CenterController@Intimacy');

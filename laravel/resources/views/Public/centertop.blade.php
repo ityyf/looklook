@@ -14,6 +14,8 @@
                     <li c_data="27"><i style="background:none;width:10px;margin-right:0;" class="s" ></i><a class='a_type' href="{{url('/collect')}}">我的收藏<i class="e"></i></a></li>
                     <li c_data="27"><i style="background:none;width:10px;margin-right:0;" class="s" ></i><a class='a_type' href="{{url('/private_list')}}">我的私信<i class="e"></i></a></li>
                     <li c_data="27"><i style="background:none;width:10px;margin-right:0;" class="s" ></i><a class='a_type' href="{{url('/friend')}}">我的好友<i class="e"></i></a></li>
+                    <li c_data="27"><i style="background:none;width:10px;margin-right:0;" class="s" ></i><a class='a_type' href="{{url('/Intimacy')}}">亲密度<i class="e"></i></a></li>
+
                 </ul>
                 <div class="clear"></div>
             </div>
