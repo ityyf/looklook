@@ -129,7 +129,7 @@
                     <li class="lists" uid="<?php echo $val['article_id'] ?>">
                         <div class="wrap">
                             <a class="alist" href="{{url('/zhengwen')}}?article_id=<?=$val['article_id']?>">
-                                <div class="list_litpic fl"><a href='{{url('head')}}'><img class="lazy" src="http://www.hanhaojie.cn/<?php echo $val['head_img'] ?>" /></a></div>
+                                <div class="list_litpic fl"><a href='#'><img class="lazy" src="http://www.hanhaojie.cn/<?php echo $val['head_img'] ?>" /></a></div>
                                 <div class="list_info">
                                     <h4><?php  echo $val['article_name']?></h4>
                                     <h5><em>(<?php echo $val['type_name'] ?>)</em></h5>

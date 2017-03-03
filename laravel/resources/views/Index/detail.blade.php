@@ -12,6 +12,7 @@
 	<meta content="black" name="apple-mobile-web-app-status-bar-style">
 	<meta content="telephone=no" name="format-detection">
 	<link rel="apple-touch-icon-precomposed" href="http://www.17sucai.com/static/images/favicon.ico">
+	<script src="js/jquery-2.1.1.min.js"></script>
 	<script>	
 		var logined = 0
 	</script>
@@ -61,8 +62,50 @@
 						<dd><?=$article['publish_time']?></dd>
 						<div class="clear"></div>
 					</dl>
-					<div class="clear"></div>
+					<dl >
+						<dt></dt>
+                        <dd>
+                            <audio id="aaa" src="http://www.music.com/<?=$article['article_music']?>"   	loop autoplay controls style='display:none'></audio>
+                            <p><img width="18px" id="bo" style="float: left" height="15px" src="images/bo.png" ><img id="stop"  src="images/stop.png" width="18px" height="15px" style="display: none;float: left"  alt=""/>
+                                <marquee direction="滚动方向" scrollamount="1" id="cli" onmouseover="stop()" onmouseout="start()" style="width: 150px;height: 21px;float: left" onclick="aaa.pause();"><b style="font-size: 14px;color: grey;"><?=$article['music_name']?></b></marquee></p>
+
+                        </dd>
+                    </dd>
+						<div class="clear"></div>
+					</dl>
 				</div>
+                <script>
+                    $('#cli').click(function () {
+//		alert(1);
+                        var audio = $("#aaa")[0];
+//		alert(audio);
+                        audio.pause();
+                        $('#bo').hide();
+                        $('#stop').show();
+                    });
+                    $('#bo').click(function () {
+                        $('#bo').hide();
+                        $('#stop').show();
+                    });
+                    $('#stop').click(function () {
+                        $('#stop').hide();
+                        $('#bo').show();
+                    });
+                    $('#stop').click(function () {
+                        var audio = $("#aaa")[0];
+//		alert(audio);
+                        audio.play();
+                        $('#cli').stop();
+                    });
+                    $('#bo').click(function () {
+                        var audio = $("#aaa")[0];
+//		alert(audio);
+                        audio.pause();
+                    });
+
+                </script>
+				<!--<input type=button  value="||" onclick="aaa.pause();">-->
+				<!--<input type=button value="\" onclick="aaa.play();" >-->
 
 				{{--文章标题--}}
 				<div class="clear">
