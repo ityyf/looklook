@@ -81,6 +81,7 @@ class IndexController extends BaseController
         $obj=new Article();
         $obj->page_view($article_id);
         $article = DB::table("article")->where('article_id','=',$article_id)->first();
+//        print_r($article)
         $user = DB::table("user")->where('user_id','=',$article['author_id'])->first();
         $article['author_info'] = $user;
 

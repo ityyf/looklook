@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\DB;
 use App\Http\Upload;
 use App\Http\Integral;
+use App\Http\Music;
 use App\Http\Article;
 class CenterController extends BaseController
 {
@@ -62,12 +63,20 @@ class CenterController extends BaseController
       *    bjq
      */
     public function add_pro(){
+        $music_name=$_FILES['article_music']['name'];
         $user_id=session('user_id');
         $data=Input::get();
-        // print_r($data);die;
         $obj=new Upload();
         $re=$obj->up_img($_FILES['head_img']);
+//         print_r($data);die;
+        $music_into = new Music();
+        $res= $music_into->up_music($_FILES['article_music']);
+
+//        print_r($res);die;
+
+//        print_r($re);die;
         $data['img_name']=$re;
+//        $data['article_music']=$res;
         $checkData=new Article();
         $data=$checkData->check($data);
       
@@ -81,7 +90,10 @@ class CenterController extends BaseController
                 'author_id' => $user_id,
                 'publish_time' => date('Y-m-d'),
                 'head_img'=>$data['img_name'],
-                'status'=>0 ]);
+                'status'=>0,
+                 'article_music'=>$res,
+                 'music_name'=>$music_name
+             ]);
              if($id){
                  $Integral = new Integral();
                  $Integral->addIntegral($user_id,5);
