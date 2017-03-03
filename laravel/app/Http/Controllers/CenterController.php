@@ -656,5 +656,5 @@ class CenterController extends BaseController
         $array = array_slice($array,0,5);
         return view('Center.intimacy',['array'=>$array]);
     }
-
+    
 }
