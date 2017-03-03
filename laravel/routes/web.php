@@ -15,6 +15,10 @@ Route::group(['middleware' => ['web','admin.login.login']], function () {
 	Route::get('comment_article',"CenterController@comment");
 	Route::post('add_pro',"CenterController@add_pro");
 	Route::get('/center',"CenterController@index");
+	//签到页面
+	Route::get('/checkIn',"CenterController@checkIn");
+	Route::get('/checkInAdd',"CenterController@checkInAdd");
+
 	//我的铺子
 	Route::get('op',"CenterController@shop");
 	//我的动态

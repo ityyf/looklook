@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use DB;
 use Illuminate\Support\Facades\Input;
 use App\Http\Article;
+use App\Http\Integral;
 class IndexController extends BaseController
 {
     
@@ -258,6 +259,11 @@ LABEL;
         //更新article表 点赞数量
         $sql = "update article set `like`=`like`+1 where article_id = $article_id";
         $res1 = DB::select($sql);
+        if ($res1)
+        {
+            $integral = new Integral();
+            $integral->addIntegral($user_id,1);
+        }
 
         die('0');
 

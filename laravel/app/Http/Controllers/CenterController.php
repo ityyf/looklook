@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\DB;
 use App\Http\Upload;
+use App\Http\Integral;
 use App\Http\Article;
 class CenterController extends BaseController
 {
@@ -15,6 +16,7 @@ class CenterController extends BaseController
      *    shh
      */
     public function index(){
+
         $user_id=session('user_id');
         $article = DB::table('article')
             ->select('article.article_id','reply_num','article_name','like','page_views','head_img','status','type_name','publish_time')
@@ -80,6 +82,9 @@ class CenterController extends BaseController
                 'head_img'=>$data['img_name'],
                 'status'=>0 ]);
              if($id){
+                 $Integral = new Integral();
+                 $Integral->addIntegral($user_id,5);
+
                 return redirect('center');
             }else{
                 echo "<script>alert('添加失败');history.go(-1)</script>";
@@ -591,6 +596,137 @@ class CenterController extends BaseController
         return view("Center.myreply",[
             'reply'=>$reply
         ]);
+    }
+
+    /**
+     * 签到页面
+     */
+    public function checkIn(){
+        $userId = session('user_id');   //用户ID
+        $years= date('Y-m');    //当天的年月
+        $status = 0;            //当天是否签到
+        //获取当月签到日期
+        $days = DB::table('checkout')->select('c_day')->where(['user_id'=>$userId,'c_years'=>$years])->get();
+        $day = [];
+        foreach ($days as $k=>$v)
+        {
+            $day[$k] = $v['c_day'];
+        }
+        if (in_array(date('j'),$day))
+        {
+            $status = 1;
+        }
+        //获取当前积分
+        $integral = DB::table('user')->select('integral')->where(['user_id'=>$userId])->first();
+        //获取连续签到次数
+        $continuous = DB::table('checkin')->select('continuous')->where(['user_id'=>$userId])->first();
+//        print_r($integral);die;
+        $riqi = $this->riqi(date('Y-m-d'));
+        return view('Center.checkIn',['riqi'=>$riqi,'integral'=>$integral,'continuous'=>$continuous,'status'=>$status]);
+    }
+
+    /**
+     * 签到添加
+     */
+    public function checkInAdd()
+    {
+        date_default_timezone_set('PRC');
+        $userId = session('user_id');
+        $d = date('d');         //当天日期
+        $years = date('Y-m');   //当天年月
+        $Integral = new Integral();     //调用积分类
+        $check = ['user_id'=>$userId,'c_years'=>$years,'c_day'=>$d];
+        $checkIn = DB::table('checkin')->where(['user_id'=>$userId])->first();
+        if (empty($checkIn))
+        {
+            //第一次签到
+            $data = ['user_id'=>$userId,'last_time'=>date('Y-m-d'),'continuous'=>1];
+            DB::table('checkin')->insertGetId($data);
+            DB::table('checkout')->insert($check);
+            $Integral->addIntegral($userId,3);
+            echo 2;die;
+
+        }
+        else
+        {
+            $last_time = $checkIn['last_time'];
+            $time = date('Y-m-d');
+            $re = $this->strtime($last_time,$time);
+            if ($re == 0)
+            {
+                //已签到
+                echo 0;die;
+            }
+            elseif ($re == 1)
+            {
+
+                DB::table('checkin')->where(['user_id'=>$userId])->increment('continuous','continuous'+1,['last_time'=>$time]);
+                DB::table('checkout')->insert($check);
+                if($checkIn['continuous'] < 17)
+                {
+                    //16天内连续签到
+                    $Integral->addIntegral($userId,4);
+                    echo 4;die;
+                }
+                else
+                {
+                    //16天后连续签到
+                    $Integral->addIntegral($userId,5);
+                    echo 5;die;
+                }
+            }
+            else
+            {
+                //没有连续签到
+                $Integral->addIntegral($userId,3);
+                DB::table('checkin')->where(['user_id'=>$userId])->update(['continuous'=>1,'last_time'=>$time]);
+                DB::table('checkout')->insert($check);
+                $Integral->addIntegral($userId,3);
+                echo 3;die;
+            }
+        }
+
+    }
+
+    /**
+     * 获取签到时间差
+     *
+     * @param $date1    //上次签到日期
+     * @param $date2    //当天日期
+     * @return $Days int 0:已签到；1：连续签到；
+     */
+    public function strtime($date1,$date2)
+    {
+        $Date_List_a1=explode("-",$date1);
+        $Date_List_a2=explode("-",$date2);
+        $d1=mktime(0,0,0,$Date_List_a1[1],$Date_List_a1[2],$Date_List_a1[0]);
+        $d2=mktime(0,0,0,$Date_List_a2[1],$Date_List_a2[2],$Date_List_a2[0]);
+        $Days=round(($d2-$d1)/3600/24);
+        return $Days;
+    }
+
+    /**
+     * 获取一周的日期
+     *
+     * @param $week   当天的日期
+     * @return array  一周的日期
+     */
+    public function riqi($week)
+    {
+        $whichD=date('w',strtotime($week));
+        $weeks=array();
+        for($i=0;$i<7;$i++){
+            if($i<$whichD)
+            {
+                $date=strtotime($week)-($whichD-$i)*24*3600;
+            }else
+            {
+                $date=strtotime($week)+($i-$whichD)*24*3600;
+            }
+            $weeks[$i]=date('j',$date);
+
+        }
+        return $weeks;
     }
 
 }

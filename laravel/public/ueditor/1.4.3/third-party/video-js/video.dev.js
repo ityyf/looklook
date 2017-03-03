@@ -191,7 +191,7 @@ vjs.CoreObject.extend = function(props){
   props = props || {};
   // Set up the constructor using the supplied init method
   // or using the init of the parent object
-  // Make sure to check the unobfuscated version for external libs
+  // Make sure to check the unobfuscated version for external libraries
   init = props['init'] || props.init || this.prototype['init'] || this.prototype.init || function(){};
   // In Resig's simple class inheritance (previously used) the constructor
   //  is a function that calls `this.init.apply(arguments)`
@@ -3245,7 +3245,7 @@ vjs.Player.prototype.techGet = function(method){
     try {
       return this.tech[method]();
     } catch(e) {
-      // When building additional tech libs, an expected method may not be defined yet
+      // When building additional tech libraries, an expected method may not be defined yet
       if (this.tech[method] === undefined) {
         vjs.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
       } else {
